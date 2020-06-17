@@ -92,13 +92,13 @@ class Controller:
             self.quicksort(profissionais_array, 0, idx, self.comp_strings)
             # Print the profissonal names
             if i == 0:
-                print("Profissionais de Medicina:\n")
+                category_name = "Medicina"
             elif i == 1:
-                print("Profissionais de Enfermagem:\n")
+                category_name = "Enfermagem"
             elif i == 2:
-                print("Profissionais de Auxiliar:\n")
+                category_name = "Auxiliar"
             for j in range(list_names_size ):
-                print(f"{profissionais_array[j]}\n")    
+                print(f"{category_name} {profissionais_array[j]}\n")    
 
     def listar_utentes(self):
         pass
