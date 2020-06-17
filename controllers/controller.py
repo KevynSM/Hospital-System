@@ -83,8 +83,22 @@ class Controller:
         pass
 
     def listar_familias(self):
-        # list_keys = self.family_universe.keys()
-        pass
+        list_families = self.family_universe.keys()
+        list_families_size = list_families.size()
+        families_array = (list_families_size * ctypes.py_object)() # Array of pointers
+        idx = -1
+        # Passing the families from the linkedlist to an Array
+        it = list_families.iterator()
+        while it.next():
+            current_item = it.next()
+            idx += 1
+            families_array[idx] = current_item
+        # Ordering the array with families
+        self.quicksort(families_array, 0, idx, self.comp_strings)
+        # Print the families
+        for i in range(list_families_size):
+            print(f"{families_array[i]}")
+        
         
 
     def comp_strings(self, a, b):
