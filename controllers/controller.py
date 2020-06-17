@@ -1,4 +1,5 @@
 from aed_ds.dictionaries.hash_table import HashTable
+from aed_ds.lists.singly_linked_list import SinglyLinkedList
 from models.profissional import Profissional
 from models.utente import Utente
 from models.family import Family
@@ -101,7 +102,99 @@ class Controller:
                 print(f"{category_name} {profissionais_array[j]}\n")    
 
     def listar_utentes(self):
-        pass
+        if self.utente_universe.size() == 0:
+            print(f"Sem utentes registrados\n")
+        else:
+            list_itens = self.utente_universe.items()
+            # 3 list to separate the "faixas etarias"
+            list_jovens = SinglyLinkedList()
+            list_adultos = SinglyLinkedList()
+            list_idosos = SinglyLinkedList()
+            # filing the lists
+            it = list_itens.iterator()
+            while it.next():
+                current_item = it.next()
+                if current_item.faixa_etaria == "Jovem":
+                    list_jovens.insert_last(current_item.name)
+                elif current_item.faixa_etaria == "Adulto":
+                    list_adultos.insert_last(current_item.name)
+                elif current_item.faixa_etaria == "Idoso":
+                    list_idosos.insert_last(current_item.name)
+            # Create an array for each "faixa etaria" list
+            list_jovens_size = list_jovens.size()
+            jovens_array = (list_jovens_size * ctypes.py_object)() # Array of pointers
+            list_adultos_size = list_adultos.size()
+            adultos_array = (list_adultos_size * ctypes.py_object)() # Array of pointers
+            list_idosos_size = list_idosos.size()
+            idosos_array = (list_idosos_size * ctypes.py_object)() # Array of pointers
+            # Passing the lists to an Array and ordering
+            # jovens
+            idx = -1
+            it = list_jovens.iterator()
+            while it.next():
+                current_item = it.next()
+                idx += 1
+                jovens_array[idx] = current_item
+            self.quicksort(jovens_array, 0, idx, self.comp_strings)
+            # Adultos
+            idx = -1
+            it = list_adultos.iterator()
+            while it.next():
+                current_item = it.next()
+                idx += 1
+                adultos_array[idx] = current_item
+            self.quicksort(adultos_array, 0, idx, self.comp_strings)
+            # Idosos
+            idx = -1
+            it = list_idosos.iterator()
+            while it.next():
+                current_item = it.next()
+                idx += 1
+                idosos_array[idx] = current_item
+            self.quicksort(idosos_array, 0, idx, self.comp_strings)
+            # Create an ordered array of familis names
+            # Exacly how it is in the function listar_familias()
+            list_families = self.family_universe.keys()
+            list_families_size = list_families.size()
+            families_array = (list_families_size * ctypes.py_object)() # Array of pointers
+            idx = -1
+            # Passing the families from the linkedlist to an Array
+            it = list_families.iterator()
+            while it.next():
+                current_item = it.next()
+                idx += 1
+                families_array[idx] = current_item
+            # Ordering the array with families
+            self.quicksort(families_array, 0, idx, self.comp_strings)
+
+            # Print the Jovem-Adulto-Idoso order for each Family
+            for i in range(list_families_size):
+                for j in range(list_jovens_size):
+                    if families_array[i] == self.utente_universe.get(jovens_array[j]).familia_associada:
+                        print(f"{families_array[i]} Jovem {jovens_array[j]}\n")
+                
+                for j in range(list_adultos_size):
+                    if families_array[i] == self.utente_universe.get(adultos_array[j]).familia_associada:
+                        print(f"{families_array[i]} Adulto {adultos_array[j]}\n")
+
+                for j in range(list_idosos_size):
+                    if families_array[i] == self.utente_universe.get(idosos_array[j]).familia_associada:
+                        print(f"{families_array[i]} Idoso {idosos_array[j]}\n")
+
+            # Print the utenes witchout families associated
+            for i in range(list_jovens_size):
+                if self.utente_universe.get(jovens_array[i]).familia_associada == None:
+                    print(f"Jovem {jovens_array[i]}\n")
+            
+            for i in range(list_adultos_size):
+                if self.utente_universe.get(adultos_array[i]).familia_associada == None:
+                    print(f"Adulto {adultos_array[i]}\n")
+
+            for i in range(list_idosos_size):
+                if self.utente_universe.get(idosos_array[i]).familia_associada == None:
+                    print(f"Idoso {idosos_array[i]}\n")
+
+
 
     def listar_familias(self):
         list_families = self.family_universe.keys()
