@@ -86,3 +86,28 @@ class Controller:
         # list_keys = self.family_universe.keys()
         pass
         
+
+    def comp_strings(self, a, b):
+        return any([a[i] < b[i] for i in range(min(len(a),len(b)))])
+
+    def quicksort(self, l, left, right, comp):
+        i = left
+        j = right
+        pivot = l[int((i+j)/2)]
+        while i <= j:
+            while comp(l[i], pivot):
+                i += 1
+            while comp(pivot, l[j]):
+                j -= 1
+            if i <= j:
+                tmp = l[j]
+                l[j] = l[i]
+                l[i] = tmp
+                i += 1
+                j -= 1
+        if left < j:
+            self.quicksort(l, left, j, comp)
+        if i < right:
+            self.quicksort(l, i, right, comp)
+
+    
