@@ -77,7 +77,28 @@ class Controller:
             
 
     def listar_profissionais(self):
-        pass
+        for i in range(3):
+            list_names = self.category_array[i].keys()
+            list_names_size = list_names.size()
+            profissionais_array = (list_names_size * ctypes.py_object)() # Array of pointers
+            idx = -1
+            # Passing the profissional names from the linkedList to an Array
+            it = list_names.iterator()
+            while it.next():
+                current_item = it.next()
+                idx += 1
+                profissionais_array[idx] = current_item
+            # Ordering the array with profissional names
+            self.quicksort(profissionais_array, 0, idx, self.comp_strings)
+            # Print the profissonal names
+            if i == 0:
+                print("Profissionais de Medicina:\n")
+            elif i == 1:
+                print("Profissionais de Enfermagem:\n")
+            elif i == 2:
+                print("Profissionais de Auxiliar:\n")
+            for j in range(list_names_size ):
+                print(f"{profissionais_array[j]}\n")    
 
     def listar_utentes(self):
         pass
@@ -97,7 +118,7 @@ class Controller:
         self.quicksort(families_array, 0, idx, self.comp_strings)
         # Print the families
         for i in range(list_families_size):
-            print(f"{families_array[i]}")
+            print(f"{families_array[i]}\n")
         
         
 
