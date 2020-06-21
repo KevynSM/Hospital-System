@@ -216,7 +216,7 @@ class Controller:
         
 
     def comp_strings(self, a, b):
-        return any([a[i] < b[i] for i in range(min(len(a),len(b)))])
+        return not(any([a[i] > b[i] for i in range(min(len(a),len(b)))]))
 
     def quicksort(self, l, left, right, comp):
         i = left
