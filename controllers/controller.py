@@ -216,7 +216,7 @@ class Controller:
     
     def mostrar_familia(self, family_name):
         if not(family_universe.has_key(family_name)):
-            printf"Familia inexistente"
+            print("Familia inexistente")
         else:
             list_itens = self.utente_universe.items()
             # 3 list to separate the "faixas etarias"
@@ -265,18 +265,18 @@ class Controller:
                 idx += 1
                 idosos_array[idx] = current_item
             self.quicksort(idosos_array, 0, idx, self.comp_strings)
-             # Print the Jovem-Adulto-Idoso order for the Family
-             for j in range(list_jovens_size):
-                    if family_name == self.utente_universe.get(jovens_array[j]).familia_associada:
-                        print(f"Jovem {jovens_array[j]}\n")
+            # Print the Jovem-Adulto-Idoso order for the Family
+            for j in range(list_jovens_size):
+                if family_name == self.utente_universe.get(jovens_array[j]).familia_associada:
+                    print(f"Jovem {jovens_array[j]}\n")
                 
-                for j in range(list_adultos_size):
-                    if family_name == self.utente_universe.get(adultos_array[j]).familia_associada:
-                        print(f"Adulto {adultos_array[j]}\n")
+            for j in range(list_adultos_size):
+                if family_name == self.utente_universe.get(adultos_array[j]).familia_associada:
+                    print(f"Adulto {adultos_array[j]}\n")
 
-                for j in range(list_idosos_size):
-                    if family_name == self.utente_universe.get(idosos_array[j]).familia_associada:
-                        print(f"Idoso {idosos_array[j]}\n")
+            for j in range(list_idosos_size):
+                if family_name == self.utente_universe.get(idosos_array[j]).familia_associada:
+                    print(f"Idoso {idosos_array[j]}\n")
 
 
     def comp_strings(self, a, b):
