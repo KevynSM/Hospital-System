@@ -213,7 +213,71 @@ class Controller:
         for i in range(list_families_size):
             print(f"{families_array[i]}\n")
         
-        
+    
+    def mostrar_familia(self, family_name):
+        if not(family_universe.has_key(family_name)):
+            printf"Familia inexistente"
+        else:
+            list_itens = self.utente_universe.items()
+            # 3 list to separate the "faixas etarias"
+            list_jovens = SinglyLinkedList()
+            list_adultos = SinglyLinkedList()
+            list_idosos = SinglyLinkedList()
+            # filing the lists
+            it = list_itens.iterator()
+            while it.next():
+                current_item = it.next()
+                if current_item.faixa_etaria == "Jovem":
+                    list_jovens.insert_last(current_item.name)
+                elif current_item.faixa_etaria == "Adulto":
+                    list_adultos.insert_last(current_item.name)
+                elif current_item.faixa_etaria == "Idoso":
+                    list_idosos.insert_last(current_item.name)
+            # Create an array for each "faixa etaria" list
+            list_jovens_size = list_jovens.size()
+            jovens_array = (list_jovens_size * ctypes.py_object)() # Array of pointers
+            list_adultos_size = list_adultos.size()
+            adultos_array = (list_adultos_size * ctypes.py_object)() # Array of pointers
+            list_idosos_size = list_idosos.size()
+            idosos_array = (list_idosos_size * ctypes.py_object)() # Array of pointers
+            # Passing the lists to an Array and ordering
+            # jovens
+            idx = -1
+            it = list_jovens.iterator()
+            while it.next():
+                current_item = it.next()
+                idx += 1
+                jovens_array[idx] = current_item
+            self.quicksort(jovens_array, 0, idx, self.comp_strings)
+            # Adultos
+            idx = -1
+            it = list_adultos.iterator()
+            while it.next():
+                current_item = it.next()
+                idx += 1
+                adultos_array[idx] = current_item
+            self.quicksort(adultos_array, 0, idx, self.comp_strings)
+            # Idosos
+            idx = -1
+            it = list_idosos.iterator()
+            while it.next():
+                current_item = it.next()
+                idx += 1
+                idosos_array[idx] = current_item
+            self.quicksort(idosos_array, 0, idx, self.comp_strings)
+             # Print the Jovem-Adulto-Idoso order for the Family
+             for j in range(list_jovens_size):
+                    if family_name == self.utente_universe.get(jovens_array[j]).familia_associada:
+                        print(f"Jovem {jovens_array[j]}\n")
+                
+                for j in range(list_adultos_size):
+                    if family_name == self.utente_universe.get(adultos_array[j]).familia_associada:
+                        print(f"Adulto {adultos_array[j]}\n")
+
+                for j in range(list_idosos_size):
+                    if family_name == self.utente_universe.get(idosos_array[j]).familia_associada:
+                        print(f"Idoso {idosos_array[j]}\n")
+
 
     def comp_strings(self, a, b):
         return not(any([a[i] > b[i] for i in range(min(len(a),len(b)))]))
