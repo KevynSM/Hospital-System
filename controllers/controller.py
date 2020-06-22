@@ -215,7 +215,7 @@ class Controller:
         
     
     def mostrar_familia(self, family_name):
-        if not(family_universe.has_key(family_name)):
+        if not(self.family_universe.has_key(family_name)):
             print("Familia inexistente")
         else:
             list_itens = self.utente_universe.items()

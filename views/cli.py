@@ -42,20 +42,20 @@ class CLI:
 
             # Listar Profissionais
             elif commands[0] == " LP":                
-                pass
+                controller.listar_profissionais()
 
             # Listar Utentes
             elif commands[0] == "LU":
-                pass
+                controller.listar_utentes()
 
             # Listar Familias
             elif commands[0] == "LF":
-                pass
+                controller.listar_familias()
 
             # Mostrar Familia
             elif commands[0] == "MF":
                 family_name = commands[1]
-                pass
+                controller.mostrar_familia(family_name)
 
             # Marcar Cuidados a Utente
             elif commands[0] == "MC":
