@@ -8,8 +8,8 @@ import ctypes
 class Controller:
     def __init__(self):
         self.category_array = (3 * ctypes.py_object)() # Array of pointers        
-        for _ in range(3):
-            self.category_array.insert_last(HashTable())
+        for i in range(3):
+            self.category_array[i] = HashTable()
 
         self.utente_universe = HashTable()
         
@@ -23,50 +23,50 @@ class Controller:
         elif category == "Auxiliar":
             idx = 2
         else:
-            print("Categoria  inexistente.\n")
+            print("Categoria  inexistente.")
 
         if self.category_array[idx].has_key(name):
-            print("Profissional existente\n")
+            print("Profissional existente")
         else:
             self.category_array[idx].insert(name,Profissional(name,category))
-            print("Profissional registrado com sucesso\n")
+            print("Profissional registrado com sucesso")
 
     def registrar_utente(self, name, faixa_etaria):
         if self.utente_universe.has_key(name):
             print("Utente existente.")
-        elif faixa_etaria is not ["Jovem", "Adulto", "Idoso"]:
-            print("Faixa etaria inexistente.\n")
+        elif faixa_etaria not in ["Jovem", "Adulto", "Idoso"]:
+            print("Faixa etaria inexistente.")
         else:
             self.utente_universe.insert(name,Utente(name,faixa_etaria))
-            print("Utente registrado com sucesso.\n")
+            print("Utente registrado com sucesso.")
 
     def registrar_familia(self,name):
         if self.family_universe.has_key(name):
-            print("Familia existente.\n")
+            print("Familia existente.")
         else:
             self.family_universe.insert(name,Family(name))
-            print("Familia registrada com sucesso.\n")
+            print("Familia registrada com sucesso.")
             
 
     def associar_utente_familia(self,name, family_name):
         if not(self.utente_universe.has_key(name)):
-            print("Utente inexistente.\n")
+            print("Utente inexistente.")
         elif not(self.family_universe.has_key(family_name)):
-            print("Familia inexistente.\n")
+            print("Familia inexistente.")
         elif self.family_universe.get(family_name).utentes_associados.find(name) != -1:
-            print("Utente percente a familia.\n")
+            print("Utente percente a familia.")
         else:
             # Associa o utente a familia
             self.family_universe.get(family_name).utentes_associados.insert_last(name)
             # Associa a familia ao utente
             self.utente_universe.get(name).familia_associada = family_name
-            print("Utente associado a familia.\n")
+            print("Utente associado a familia.")
 
     def desassociar_utente_familia(self,name):
         if not(self.utente_universe.has_key(name)):
-            print("Utente inexistente.\n")
+            print("Utente inexistente.")
         elif self.utente_universe.get(name).familia_associada == None:
-            print("Utente nao pertence a familia.\n")
+            print("Utente nao pertence a familia.")
         else:
             # Desassocia o utente da familia
             family_name = self.utente_universe.get(name).familia_associada
@@ -74,6 +74,7 @@ class Controller:
             self.family_universe.get(family_name).utentes_associados.remove(position)
             # Desassocia a familia do utente
             self.utente_universe.get(name).familia_associada = None
+            print("Utente desassociado da familia.")
 
             
 
@@ -85,7 +86,7 @@ class Controller:
             idx = -1
             # Passing the profissional names from the linkedList to an Array
             it = list_names.iterator()
-            while it.next():
+            while it.has_next():
                 current_item = it.next()
                 idx += 1
                 profissionais_array[idx] = current_item
@@ -99,11 +100,11 @@ class Controller:
             elif i == 2:
                 category_name = "Auxiliar"
             for j in range(list_names_size ):
-                print(f"{category_name} {profissionais_array[j]}\n")    
+                print(f"{category_name} {profissionais_array[j]}")    
 
     def listar_utentes(self):
         if self.utente_universe.size() == 0:
-            print(f"Sem utentes registrados\n")
+            print(f"Sem utentes registrados")
         else:
             list_itens = self.utente_universe.items()
             # 3 list to separate the "faixas etarias"
@@ -112,14 +113,14 @@ class Controller:
             list_idosos = SinglyLinkedList()
             # filing the lists
             it = list_itens.iterator()
-            while it.next():
+            while it.has_next():
                 current_item = it.next()
-                if current_item.faixa_etaria == "Jovem":
-                    list_jovens.insert_last(current_item.name)
-                elif current_item.faixa_etaria == "Adulto":
-                    list_adultos.insert_last(current_item.name)
-                elif current_item.faixa_etaria == "Idoso":
-                    list_idosos.insert_last(current_item.name)
+                if current_item.get_value().faixa_etaria == "Jovem":
+                    list_jovens.insert_last(current_item.get_value().name)
+                elif current_item.get_value().faixa_etaria == "Adulto":
+                    list_adultos.insert_last(current_item.get_value().name)
+                elif current_item.get_value().faixa_etaria == "Idoso":
+                    list_idosos.insert_last(current_item.get_value().name)
             # Create an array for each "faixa etaria" list
             list_jovens_size = list_jovens.size()
             jovens_array = (list_jovens_size * ctypes.py_object)() # Array of pointers
@@ -131,7 +132,7 @@ class Controller:
             # jovens
             idx = -1
             it = list_jovens.iterator()
-            while it.next():
+            while it.has_next():
                 current_item = it.next()
                 idx += 1
                 jovens_array[idx] = current_item
@@ -139,7 +140,7 @@ class Controller:
             # Adultos
             idx = -1
             it = list_adultos.iterator()
-            while it.next():
+            while it.has_next():
                 current_item = it.next()
                 idx += 1
                 adultos_array[idx] = current_item
@@ -147,7 +148,7 @@ class Controller:
             # Idosos
             idx = -1
             it = list_idosos.iterator()
-            while it.next():
+            while it.has_next():
                 current_item = it.next()
                 idx += 1
                 idosos_array[idx] = current_item
@@ -160,7 +161,7 @@ class Controller:
             idx = -1
             # Passing the families from the linkedlist to an Array
             it = list_families.iterator()
-            while it.next():
+            while it.has_next():
                 current_item = it.next()
                 idx += 1
                 families_array[idx] = current_item
@@ -171,28 +172,28 @@ class Controller:
             for i in range(list_families_size):
                 for j in range(list_jovens_size):
                     if families_array[i] == self.utente_universe.get(jovens_array[j]).familia_associada:
-                        print(f"{families_array[i]} Jovem {jovens_array[j]}\n")
+                        print(f"{families_array[i]} Jovem {jovens_array[j]}")
                 
                 for j in range(list_adultos_size):
                     if families_array[i] == self.utente_universe.get(adultos_array[j]).familia_associada:
-                        print(f"{families_array[i]} Adulto {adultos_array[j]}\n")
+                        print(f"{families_array[i]} Adulto {adultos_array[j]}")
 
                 for j in range(list_idosos_size):
                     if families_array[i] == self.utente_universe.get(idosos_array[j]).familia_associada:
-                        print(f"{families_array[i]} Idoso {idosos_array[j]}\n")
+                        print(f"{families_array[i]} Idoso {idosos_array[j]}")
 
             # Print the utenes witchout families associated
             for i in range(list_jovens_size):
                 if self.utente_universe.get(jovens_array[i]).familia_associada == None:
-                    print(f"Jovem {jovens_array[i]}\n")
+                    print(f"Jovem {jovens_array[i]}")
             
             for i in range(list_adultos_size):
                 if self.utente_universe.get(adultos_array[i]).familia_associada == None:
-                    print(f"Adulto {adultos_array[i]}\n")
+                    print(f"Adulto {adultos_array[i]}")
 
             for i in range(list_idosos_size):
                 if self.utente_universe.get(idosos_array[i]).familia_associada == None:
-                    print(f"Idoso {idosos_array[i]}\n")
+                    print(f"Idoso {idosos_array[i]}")
 
 
 
@@ -203,7 +204,7 @@ class Controller:
         idx = -1
         # Passing the families from the linkedlist to an Array
         it = list_families.iterator()
-        while it.next():
+        while it.has_next():
             current_item = it.next()
             idx += 1
             families_array[idx] = current_item
@@ -211,7 +212,7 @@ class Controller:
         self.quicksort(families_array, 0, idx, self.comp_strings)
         # Print the families
         for i in range(list_families_size):
-            print(f"{families_array[i]}\n")
+            print(f"{families_array[i]}")
         
     
     def mostrar_familia(self, family_name):
@@ -225,14 +226,14 @@ class Controller:
             list_idosos = SinglyLinkedList()
             # filing the lists
             it = list_itens.iterator()
-            while it.next():
+            while it.has_next():
                 current_item = it.next()
-                if current_item.faixa_etaria == "Jovem":
-                    list_jovens.insert_last(current_item.name)
-                elif current_item.faixa_etaria == "Adulto":
-                    list_adultos.insert_last(current_item.name)
-                elif current_item.faixa_etaria == "Idoso":
-                    list_idosos.insert_last(current_item.name)
+                if current_item.get_value().faixa_etaria == "Jovem":
+                    list_jovens.insert_last(current_item.get_value().name)
+                elif current_item.get_value().faixa_etaria == "Adulto":
+                    list_adultos.insert_last(current_item.get_value().name)
+                elif current_item.get_value().faixa_etaria == "Idoso":
+                    list_idosos.insert_last(current_item.get_value().name)
             # Create an array for each "faixa etaria" list
             list_jovens_size = list_jovens.size()
             jovens_array = (list_jovens_size * ctypes.py_object)() # Array of pointers
@@ -244,7 +245,7 @@ class Controller:
             # jovens
             idx = -1
             it = list_jovens.iterator()
-            while it.next():
+            while it.has_next():
                 current_item = it.next()
                 idx += 1
                 jovens_array[idx] = current_item
@@ -252,7 +253,7 @@ class Controller:
             # Adultos
             idx = -1
             it = list_adultos.iterator()
-            while it.next():
+            while it.has_next():
                 current_item = it.next()
                 idx += 1
                 adultos_array[idx] = current_item
@@ -260,7 +261,7 @@ class Controller:
             # Idosos
             idx = -1
             it = list_idosos.iterator()
-            while it.next():
+            while it.has_next():
                 current_item = it.next()
                 idx += 1
                 idosos_array[idx] = current_item
@@ -268,15 +269,15 @@ class Controller:
             # Print the Jovem-Adulto-Idoso order for the Family
             for j in range(list_jovens_size):
                 if family_name == self.utente_universe.get(jovens_array[j]).familia_associada:
-                    print(f"Jovem {jovens_array[j]}\n")
+                    print(f"Jovem {jovens_array[j]}")
                 
             for j in range(list_adultos_size):
                 if family_name == self.utente_universe.get(adultos_array[j]).familia_associada:
-                    print(f"Adulto {adultos_array[j]}\n")
+                    print(f"Adulto {adultos_array[j]}")
 
             for j in range(list_idosos_size):
                 if family_name == self.utente_universe.get(idosos_array[j]).familia_associada:
-                    print(f"Idoso {idosos_array[j]}\n")
+                    print(f"Idoso {idosos_array[j]}")
 
 
     def comp_strings(self, a, b):
