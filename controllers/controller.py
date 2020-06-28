@@ -7,100 +7,251 @@ import ctypes
 
 class Controller:
     def __init__(self):
-        self.category_array = (3 * ctypes.py_object)() # Array of pointers        
-        for i in range(3):
-            self.category_array[i] = HashTable()
+        # self.category_array = (3 * ctypes.py_object)() # Array of pointers        
+        # for i in range(3):
+        #     self.category_array[i] = HashTable()
+
+        self.categories = HashTable()
+        self.categories.insert("Medicina", HashTable())
+        self.categories.insert("Enfermagem", HashTable())
+        self.categories.insert("Auxiliar", HashTable())
 
         self.utente_universe = HashTable()
         
         self.family_universe = HashTable()
 
-    def registrar_profissional(self, category, name):
-        if category == "Medicina":
-            idx = 0
-        elif category == "Enfermagem":
-            idx = 1
-        elif category == "Auxiliar":
-            idx = 2
-        else:
-            print("Categoria  inexistente.")
+        self.servicos = HashTable()
+        self.servicos.insert("Consulta",SinglyLinkedList())
+        self.servicos.insert("PequenaCirurgia",SinglyLinkedList())
+        self.servicos.insert("Enfermagem",SinglyLinkedList())
 
-        if self.category_array[idx].has_key(name):
-            print("Profissional existente")
-        else:
-            self.category_array[idx].insert(name,Profissional(name,category))
-            print("Profissional registrado com sucesso")
+    
+    # Booleans
+    def has_utente(self, name):
+        if self.utente_universe.has_key(name):
+            return True
+        return False
+
+    def has_faixa_etaria(self, faixa_etaria):
+        if faixa_etaria in ["Jovem", "Adulto", "Idoso"]:
+            return True
+        return False
+
+    def has_that_family(self, family_name):        
+        if self.family_universe.has_key(family_name):
+            return True
+        return False
+
+    def has_family(self):
+        if self.family_universe.size():
+            return True
+        return False
+        
+    def utente_has_family(self, name):
+        if self.utente_universe.get(name).familia_associada != None:
+            return True 
+        return False
+
+    def has_category(self, name):
+        list_categories = self.categories.keys()
+        it = list_categories.iterator()
+        while it.has_next():
+            current_item = it.next()
+            if name == current_item:
+                return True
+        return False
+
+
+    def has_profissional(self):
+        list_keys = self.categories.keys()        
+        it = list_keys.iterator()
+        while it.has_next():
+            current_item = it.next()
+            if self.categories.get(current_item).size() > 0:
+                return True
+        return False
+
+    def has_profissional_category(self, name, category):
+        list_profissionais = self.categories.get(category).keys()
+        it = list_profissionais.iterator()
+        while it.has_next():
+            current_item = it.next()
+            if name == current_item:
+                return True
+        return False
+
+    def has_servico(self, name):
+        list_servicos = self.servicos.keys()
+        it = list_servicos.iterator()
+        while it.has_next():
+            current_item = it.next()
+            if name == current_item:
+                return True
+        return False
+
+    # do something
+    def registrar_profissional(self, name, category):
+        self.categories.get(category).insert(name,Profissional(name,category))
 
     def registrar_utente(self, name, faixa_etaria):
-        if self.utente_universe.has_key(name):
-            print("Utente existente.")
-        elif faixa_etaria not in ["Jovem", "Adulto", "Idoso"]:
-            print("Faixa etaria inexistente.")
-        else:
-            self.utente_universe.insert(name,Utente(name,faixa_etaria))
-            print("Utente registrado com sucesso.")
+        self.utente_universe.insert(name,Utente(name,faixa_etaria))
 
-    def registrar_familia(self,name):
-        if self.family_universe.has_key(name):
-            print("Familia existente.")
-        else:
-            self.family_universe.insert(name,Family(name))
-            print("Familia registrada com sucesso.")
-            
+    def registrar_familia(self, name):
+        self.family_universe.insert(name,Family(name))
 
-    def associar_utente_familia(self,name, family_name):
-        if not(self.utente_universe.has_key(name)):
-            print("Utente inexistente.")
-        elif not(self.family_universe.has_key(family_name)):
-            print("Familia inexistente.")
-        elif self.family_universe.get(family_name).utentes_associados.find(name) != -1:
-            print("Utente percente a familia.")
-        else:
-            # Associa o utente a familia
-            self.family_universe.get(family_name).utentes_associados.insert_last(name)
-            # Associa a familia ao utente
-            self.utente_universe.get(name).familia_associada = family_name
-            print("Utente associado a familia.")
+    def associar_utente_familia(self, name, family_name):
+        # Associa o utente a familia
+        self.family_universe.get(family_name).utentes_associados.insert_last(name)
+        # Associa a familia ao utente
+        self.utente_universe.get(name).familia_associada = family_name        
 
     def desassociar_utente_familia(self,name):
-        if not(self.utente_universe.has_key(name)):
-            print("Utente inexistente.")
-        elif self.utente_universe.get(name).familia_associada == None:
-            print("Utente nao pertence a familia.")
-        else:
-            # Desassocia o utente da familia
-            family_name = self.utente_universe.get(name).familia_associada
-            position = self.family_universe.get(family_name).utentes_associados.find(name)
-            self.family_universe.get(family_name).utentes_associados.remove(position)
-            # Desassocia a familia do utente
-            self.utente_universe.get(name).familia_associada = None
-            print("Utente desassociado da familia.")
+        # Desassocia o utente da familia
+        family_name = self.utente_universe.get(name).familia_associada
+        position = self.family_universe.get(family_name).utentes_associados.find(name)
+        self.family_universe.get(family_name).utentes_associados.remove(position)
+        # Desassocia a familia do utente
+        self.utente_universe.get(name).familia_associada = None
+
+    def listar_profissionais(self):
+        #list that will be return
+        list_profissionais = SinglyLinkedList()
+        # list_categories = [Medicina, Enfermagem, Auxiliar]
+        list_categories = self.categories.keys()
+        # for each category
+        it = list_categories.iterator()
+        while it.has_next():
+            #category name
+            category = it.next()
+            # list of names in the caregory
+            list_names = self.categories.get(category).keys()
+            list_names_size = list_names.size()
+            if list_names_size > 0:
+                # array_size = list_name_size
+                profissionais_array = (list_names_size * ctypes.py_object)() # Array of pointers
+                idx = -1
+                # for each name in the category
+                it_category = list_names.iterator()
+                while it_category.has_next():
+                    current_item = it_category.next()
+                    idx += 1 
+                    profissionais_array[idx] = current_item
+                # order the array
+                self.quicksort(profissionais_array, 0, idx, self.comp_strings)
+                # pass the the names from the ordered array to the final list
+                for i in range(idx+1):
+                    list_profissionais.insert_last(f"{category} {profissionais_array[i]}")
+        return list_profissionais
+    
+    
+    def listar_familias(self):
+        #list that will be return
+        list_families_final = SinglyLinkedList()
+        list_families = self.family_universe.keys()
+        list_families_size = list_families.size()
+        families_array = (list_families_size * ctypes.py_object)() # Array of pointers
+        idx = -1
+        # Passing the families from the linkedlist to an Array
+        it = list_families.iterator()
+        while it.has_next():
+            current_item = it.next()
+            idx += 1
+            families_array[idx] = current_item
+        # Ordering the array with families
+        self.quicksort(families_array, 0, idx, self.comp_strings)
+        # Print the families
+        for i in range(list_families_size):
+            list_families_final.insert_last(f"{families_array[i]}")
+        return list_families_final
+
+
+    
+    # ----------------------------------------------------------------------
+    # def registrar_profissional(self, category, name):
+    #     if category == "Medicina":
+    #         idx = 0
+    #     elif category == "Enfermagem":
+    #         idx = 1
+    #     elif category == "Auxiliar":
+    #         idx = 2
+    #     else:
+    #         print("Categoria  inexistente.")
+    #     if self.category_array[idx].has_key(name):
+    #         print("Profissional existente")
+    #     else:
+    #         self.category_array[idx].insert(name,Profissional(name,category))
+    #         print("Profissional registrado com sucesso")
+
+    # def registrar_utente(self, name, faixa_etaria):
+    #     if self.utente_universe.has_key(name):
+    #         print("Utente existente.")
+    #     elif faixa_etaria not in ["Jovem", "Adulto", "Idoso"]:
+    #         print("Faixa etaria inexistente.")
+    #     else:
+    #         self.utente_universe.insert(name,Utente(name,faixa_etaria))
+    #         print("Utente registrado com sucesso.")
+    
+    # def registrar_familia(self,name):
+    #     if self.family_universe.has_key(name):
+    #         print("Familia existente.")
+    #     else:
+    #         self.family_universe.insert(name,Family(name))
+    #         print("Familia registrada com sucesso.")
+            
+
+    # def associar_utente_familia(self,name, family_name):
+    #     if not(self.utente_universe.has_key(name)):
+    #         print("Utente inexistente.")
+    #     elif not(self.family_universe.has_key(family_name)):
+    #         print("Familia inexistente.")
+    #     elif self.family_universe.get(family_name).utentes_associados.find(name) != -1:
+    #         print("Utente percente a familia.")
+    #     else:
+    #         # Associa o utente a familia
+    #         self.family_universe.get(family_name).utentes_associados.insert_last(name)
+    #         # Associa a familia ao utente
+    #         self.utente_universe.get(name).familia_associada = family_name
+    #         print("Utente associado a familia.")
+
+    # def desassociar_utente_familia(self,name):
+    #     if not(self.utente_universe.has_key(name)):
+    #         print("Utente inexistente.")
+    #     elif self.utente_universe.get(name).familia_associada == None:
+    #         print("Utente nao pertence a familia.")
+    #     else:
+    #         # Desassocia o utente da familia
+    #         family_name = self.utente_universe.get(name).familia_associada
+    #         position = self.family_universe.get(family_name).utentes_associados.find(name)
+    #         self.family_universe.get(family_name).utentes_associados.remove(position)
+    #         # Desassocia a familia do utente
+    #         self.utente_universe.get(name).familia_associada = None
+    #         print("Utente desassociado da familia.")
 
             
 
-    def listar_profissionais(self):
-        for i in range(3):
-            list_names = self.category_array[i].keys()
-            list_names_size = list_names.size()
-            profissionais_array = (list_names_size * ctypes.py_object)() # Array of pointers
-            idx = -1
-            # Passing the profissional names from the linkedList to an Array
-            it = list_names.iterator()
-            while it.has_next():
-                current_item = it.next()
-                idx += 1
-                profissionais_array[idx] = current_item
-            # Ordering the array with profissional names
-            self.quicksort(profissionais_array, 0, idx, self.comp_strings)
-            # Print the profissonal names
-            if i == 0:
-                category_name = "Medicina"
-            elif i == 1:
-                category_name = "Enfermagem"
-            elif i == 2:
-                category_name = "Auxiliar"
-            for j in range(list_names_size ):
-                print(f"{category_name} {profissionais_array[j]}")    
+    # def listar_profissionais(self):
+    #     for i in range(3):
+    #         list_names = self.category_array[i].keys()
+    #         list_names_size = list_names.size()
+    #         profissionais_array = (list_names_size * ctypes.py_object)() # Array of pointers
+    #         idx = -1
+    #         # Passing the profissional names from the linkedList to an Array
+    #         it = list_names.iterator()
+    #         while it.has_next():
+    #             current_item = it.next()
+    #             idx += 1
+    #             profissionais_array[idx] = current_item
+    #         # Ordering the array with profissional names
+    #         self.quicksort(profissionais_array, 0, idx, self.comp_strings)
+    #         # Print the profissonal names
+    #         if i == 0:
+    #             category_name = "Medicina"
+    #         elif i == 1:
+    #             category_name = "Enfermagem"
+    #         elif i == 2:
+    #             category_name = "Auxiliar"
+    #         for j in range(list_names_size ):
+    #             print(f"{category_name} {profissionais_array[j]}")    
 
     def listar_utentes(self):
         if self.utente_universe.size() == 0:
@@ -197,22 +348,22 @@ class Controller:
 
 
 
-    def listar_familias(self):
-        list_families = self.family_universe.keys()
-        list_families_size = list_families.size()
-        families_array = (list_families_size * ctypes.py_object)() # Array of pointers
-        idx = -1
-        # Passing the families from the linkedlist to an Array
-        it = list_families.iterator()
-        while it.has_next():
-            current_item = it.next()
-            idx += 1
-            families_array[idx] = current_item
-        # Ordering the array with families
-        self.quicksort(families_array, 0, idx, self.comp_strings)
-        # Print the families
-        for i in range(list_families_size):
-            print(f"{families_array[i]}")
+    # def listar_familias(self):
+    #     list_families = self.family_universe.keys()
+    #     list_families_size = list_families.size()
+    #     families_array = (list_families_size * ctypes.py_object)() # Array of pointers
+    #     idx = -1
+    #     # Passing the families from the linkedlist to an Array
+    #     it = list_families.iterator()
+    #     while it.has_next():
+    #         current_item = it.next()
+    #         idx += 1
+    #         families_array[idx] = current_item
+    #     # Ordering the array with families
+    #     self.quicksort(families_array, 0, idx, self.comp_strings)
+    #     # Print the families
+    #     for i in range(list_families_size):
+    #         print(f"{families_array[i]}")
         
     
     def mostrar_familia(self, family_name):
