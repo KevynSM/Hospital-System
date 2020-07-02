@@ -46,9 +46,9 @@ class CLI:
                 family_name = commands[1]
                 if not(controller.has_that_family(family_name)):
                     controller.registrar_familia(family_name)
-                    print("Familia registrada com sucesso.")
+                    print("Família registrada com sucesso.")
                 else:
-                    print("Familia existente.")
+                    print("Família existente.")
                 
 
             # Associar Utente de Familia
@@ -59,11 +59,11 @@ class CLI:
                     if controller.has_that_family(family_name):
                         if not(controller.utente_has_family(name)):
                             controller.associar_utente_familia(name, family_name)                            
-                            print("Utente associado a familia.")
+                            print("Utente associado a família.")
                         else:
-                            print("Utente percente a familia.")
+                            print("Utente percente a família.")
                     else:
-                        print("Familia inexistente.")
+                        print("Família inexistente.")
                 else:
                     print("Utente inexistente.")
                  
@@ -74,9 +74,9 @@ class CLI:
                 if controller.has_utente(name):
                     if controller.utente_has_family(name):
                         controller.desassociar_utente_familia(name)
-                        print("Utente desassociado da familia.")
+                        print("Utente desassociado da família.")
                     else:
-                        print("Utente nao pertence a familia.")
+                        print("Utente não pertence a família.")
                 else:
                     print("Utente inexistente.")
                 
@@ -88,14 +88,22 @@ class CLI:
                     it = list_profissionais.iterator()
                     while it.has_next():
                         current_item =  it.next()
-                        print(current_item)                    
+                        print(f"{current_item}.")                    
                 else:
                     print("Sem profissional registrado.")
                 
 
             # Listar Utentes
             elif commands[0] == "LU":
-                controller.listar_utentes()
+                if controller.there_are_utentes():                    
+                    list_utentes = controller.listar_utentes()
+                    it = list_utentes.iterator()
+                    while it.has_next():
+                        current_item = it.next()
+                        print(f"{current_item}.")
+                else:
+                    print("Sem utentes registrados.")
+                # controller.listar_utentes()
 
             # Listar Familias
             elif commands[0] == "LF":
@@ -111,6 +119,14 @@ class CLI:
             # Mostrar Familia
             elif commands[0] == "MF":
                 family_name = commands[1]
+                if controller.has_that_family(family_name):
+                    list_family = controller.mostrar_familia(family_name)
+                    it = list_family.iterator()
+                    while it.has_next():
+                        current_item = it.next()
+                        print(f"{current_item}.")
+                else:
+                    print("Família inexistente.")
                 controller.mostrar_familia(family_name)
 
 
@@ -247,4 +263,4 @@ class CLI:
                 pass
             
             else:
-                print("Instrução invalida.")
+                print("Instrução inválida.")
