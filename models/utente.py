@@ -1,3 +1,4 @@
+from aed_ds.dictionaries.hash_table import HashTable
 from aed_ds.lists.singly_linked_list import SinglyLinkedList
 
 class Utente:
@@ -5,4 +6,10 @@ class Utente:
         self.name = name
         self.faixa_etaria = faixa_etaria
         self.familia_associada = None
-        self.servico = SinglyLinkedList()
+
+        self.last_service = None
+
+        self.servicos = HashTable()
+        self.servicos.insert("Consulta",SinglyLinkedList())
+        self.servicos.insert("PequenaCirurgia",SinglyLinkedList())
+        self.servicos.insert("Enfermagem",SinglyLinkedList())

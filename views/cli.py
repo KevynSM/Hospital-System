@@ -1,4 +1,5 @@
 from controllers.controller import Controller
+from aed_ds.lists.singly_linked_list import SinglyLinkedList
 # Comand Line Interface 
 class CLI:
     def __init__(self):
@@ -112,41 +113,107 @@ class CLI:
                 family_name = commands[1]
                 controller.mostrar_familia(family_name)
 
+
             # Marcar Cuidados a Utente
             elif commands[0] == "MC":
                 name = commands[1]
                 if controller.has_utente(name):
+                    list_services = SinglyLinkedList()
                     while True:
-                        servico = input()
-                        if servico == "":
+                        service = input()
+                        if service == "":
                             break
-                        if controller.has_servico(servico):
-                            new_line = input()
-                            categoria_profissinal = new_line.split(" ")
-                            categoria = categoria_profissinal[0]
-                            profissional = categoria_profissinal[1]
-                            if controller.has_category(categoria):
-                                if controller.has_profissional_category(profissional, categoria):
-                                    # marcar cuidado a utente
-                                    pass
+                        if controller.has_service(service):
+                            # Cria o servico
+                            new_service = controller.create_service(service, name)
+                            all_good = False
+                            #Preenche o servico
+                            while True:
+                                new_line = input()
+                                if new_line == "":
+                                    break
+                                categoria_profissinal = new_line.split(" ")
+                                categoria = categoria_profissinal[0]
+                                profissional = categoria_profissinal[1]
+                                if controller.has_category(categoria):
+                                    if controller.has_profissional_category(profissional, categoria):
+                                        if controller.service_has_category(service, categoria):
+                                            controller.fill_service(new_service, profissional, categoria)
+                                            all_good = True
+                                        else:
+                                            print("Categoria inválida.")                                            
+                                    else:
+                                        print("Profissinal de saude inexistente.")                                        
                                 else:
-                                    print("Profissinal de saude inexistente.")
-                            else:
-                                print("Categoria inexistente.")
-                                break
-
+                                    print("Categoria inexistente.")                                    
+                            # Se tudo der certo
+                            # Marca o servico ao utente e ao profissional
+                            if all_good:
+                                list_services.insert_last(new_service)
+                                # controller.marcar_cuidados_utente(service, new_service, name, profissional, categoria)
+                                # print("Cuidados marcados com sucesso.")
                         else:
-                            print("Servico Inexistente.")
+                            print("Serviço Inexistente.")
                             break
-
-
                 else:
                     print("Utente Inexistente.")
+
+            # # Marcar Cuidados a Utente
+            # elif commands[0] == "MC":
+            #     name = commands[1]
+            #     if controller.has_utente(name):
+            #         while True:
+            #             service = input()
+            #             if service == "":
+            #                 break
+            #             if controller.has_service(service):
+            #                 # Cria o servico
+            #                 new_service = controller.create_service(service, name)
+            #                 all_good = False
+            #                 #Preenche o servico
+            #                 while True:
+            #                     new_line = input()
+            #                     if new_line == "":
+            #                         break
+            #                     categoria_profissinal = new_line.split(" ")
+            #                     categoria = categoria_profissinal[0]
+            #                     profissional = categoria_profissinal[1]
+            #                     if controller.has_category(categoria):
+            #                         if controller.has_profissional_category(profissional, categoria):
+            #                             if controller.service_has_category(service, categoria):
+            #                                 if controller.has_valid_sequence(name, service):
+            #                                     controller.fill_service(new_service, profissional, categoria)
+            #                                     all_good = True
+            #                                 else:
+            #                                     print("Sequencia inválida.")                                                
+            #                             else:
+            #                                 print("Categoria inválida.")                                            
+            #                         else:
+            #                             print("Profissinal de saude inexistente.")                                        
+            #                     else:
+            #                         print("Categoria inexistente.")                                    
+            #                 # Se tudo der certo
+            #                 # Marca o servico ao utente e ao profissional
+            #                 if all_good:
+            #                     controller.marcar_cuidados_utente(service, new_service, name, profissional, categoria)
+            #                     print("Cuidados marcados com sucesso.")
+            #             else:
+            #                 print("Serviço Inexistente.")
+            #                 break
+            #     else:
+            #         print("Utente Inexistente.")
 
             # Cancelar Cuidados Marcados a Utente
             elif commands[0] == "CC":
                 name = commands[1]
-                pass
+                if controller.has_utente(name):
+                    if controller.has_service_utente(name):
+                       controller.desmarcar_cuidado_utente(name)
+                       print("Cuidados de saúde desmacados com sucesso.")
+                    else:
+                        print("Utente sem cuidados de saúde marcados.")
+                else:
+                    print("Utente inexistente.")
 
             # Listar Cuidados Marcados a Utente
             elif commands[0] == "LCU":

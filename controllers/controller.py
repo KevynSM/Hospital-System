@@ -3,6 +3,7 @@ from aed_ds.lists.singly_linked_list import SinglyLinkedList
 from models.profissional import Profissional
 from models.utente import Utente
 from models.family import Family
+from models.servicos import Servico
 import ctypes
 
 class Controller:
@@ -80,7 +81,7 @@ class Controller:
                 return True
         return False
 
-    def has_servico(self, name):
+    def has_service(self, name):
         list_servicos = self.servicos.keys()
         it = list_servicos.iterator()
         while it.has_next():
@@ -88,6 +89,53 @@ class Controller:
             if name == current_item:
                 return True
         return False
+
+    def service_has_category(self, service, category):
+        if service == "Consulta":
+            if category == "Medicina":
+                return True
+        elif service == "PequenaCirurgia":
+            if category in ["Medicina", "Enfermagem", "Auxiliar"]:
+                return True
+        elif service == "Enfermagem":
+            if category in ["Enfermagem", "Auxiliar"]:
+                return True
+        return False
+
+    def has_valid_sequence(self, utente, service):
+        if self.utente_universe.get(utente).last_service == "Consulta":
+            return True
+        elif self.utente_universe.get(utente).last_service == "PequenaCirurgia":
+            if service == "Consulta":
+                return True            
+        elif self.utente_universe.get(utente).last_service == "Enfermagem":
+            if service != "PequenaCirurgia":
+                return True  
+        elif self.utente_universe.get(utente).last_service == None:
+            if service != "PequenaCirurgia":
+                return True
+        return False
+            
+    # def has_valid_sequence_list(self, list, utente):
+    #     last_service = self.utente_universe.get(utente).last_service
+    #     it = list.iterator()
+    #     while it.has_next():
+    #         current_item = it.next()
+    #         if last_service
+                
+    def has_service_utente(self, utente):
+        list_keys = self.utente_universe.get(utente).servicos.keys()
+        it = list_keys.iterator()
+        while it.has_next():
+            current_key = it.next()
+            if not(self.utente_universe.get(utente).servicos.get(current_key).is_empty()):
+                return True
+        return False
+                
+
+
+
+
 
     # do something
     def registrar_profissional(self, name, category):
@@ -157,7 +205,7 @@ class Controller:
             current_item = it.next()
             idx += 1
             families_array[idx] = current_item
-        # Ordering the array with families
+        # Ordering the array with families        
         self.quicksort(families_array, 0, idx, self.comp_strings)
         # Print the families
         for i in range(list_families_size):
@@ -165,7 +213,103 @@ class Controller:
         return list_families_final
 
 
-    
+    def create_service(self, service, utente):
+        return Servico(service, utente)
+
+    def fill_service(self, service, profissional, category):
+        service.profissionais.get(category).insert_last(profissional)
+
+
+    def marcar_cuidados_utente(self, service, new_service, utente, profissional, category):        
+        # Marca service com o utente
+        self.utente_universe.get(utente).servicos.get(service).insert_last(new_service)
+        self.utente_universe.get(utente).last_service = service
+        # Marca o service com o profissional
+        self.categories.get(category).get(profissional).servicos.get(service).insert(utente, new_service)
+        # Marcaro service na lista de services
+        self.servicos.get(service).insert_last(new_service)
+
+
+    def desmarcar_cuidado_utente(self, utente):
+        # For each category service
+        for service_category in ["Consulta", "PequenaCirurgia", "Enfermagem"]:
+            # lista com os servicos de uma service_category
+            list_service = self.utente_universe.get(utente).servicos.get(service_category)
+            #Se essa lista nao estiver vazia
+            if not(list_service.is_empty()):
+                # for each servico de uma categoria de servico
+                it = list_service.iterator()
+                while it.has_next():
+                    current_service = it.next()
+                    # lista de profissionais de cada categoria por categoria de servico
+                    if service_category == "Consulta":
+                        list_profissionais_medicina = current_service.profissionais.get("Medicina")
+                    elif service_category == "PequenaCirurgia":
+                        list_profissionais_medicina = current_service.profissionais.get("Medicina")
+                        list_profissionais_enfermagem = current_service.profissionais.get("Enfermagem")
+                        list_profissionais_auxiliar = current_service.profissionais.get("Auxiliar")
+                    elif service_category == "Enfermagem":
+                        list_profissionais_enfermagem = current_service.profissionais.get("Enfermagem")
+                        list_profissionais_auxiliar = current_service.profissionais.get("Auxiliar")
+
+                if service_category in ["Consulta", "PequenaCirurgia"]:
+                    # se a lista de profissinal nao estiver vazia
+                    if not(list_profissionais_medicina.is_empty()):
+                        # Para cara nome de profissional
+                        it = list_profissionais_medicina.iterator()
+                        while it.has_next():
+                            current_profissional = it.next()
+                            # remove o servico do profissional
+                            self.categories.get("Medicina").get(current_profissional).servicos.get(service_category).remove(utente)
+
+                if service_category in ["PequenaCirurgia", "Enfermagem"]:                    
+                    # se a lista de profissinal nao estiver vazia
+                    if not(list_profissionais_enfermagem.is_empty()):
+                        # Para cara nome de profissional
+                        it = list_profissionais_enfermagem.iterator()
+                        while it.has_next():
+                            current_profissional = it.next()
+                            # remove o servico do profissional
+                            self.categories.get("Enfermagem").get(current_profissional).servicos.get(service_category).remove(utente)
+
+                    # se a lista de profissinal nao estiver vazia
+                    if not(list_profissionais_auxiliar.is_empty()):
+                        # Para cara nome de profissional
+                        it = list_profissionais_auxiliar.iterator()
+                        while it.has_next():
+                            current_profissional = it.next()
+                            # remove o servico do profissional
+                            self.categories.get("Auxiliar").get(current_profissional).servicos.get(service_category).remove(utente)
+
+               
+            
+            
+            #deleto toda a lista de servicos de uma categoria de servico do utente 
+            self.utente_universe.get(utente).servicos.get(service_category).make_empty()
+
+            # lista para ter as posicoes contendo servicos com o utente
+            list_positions = SinglyLinkedList()
+            idx = -1
+            # por cada servico
+            it = self.servicos.get(service_category).iterator()
+            while it.has_next():
+                current_service = it.next()
+                idx += 1
+                # se o servico tiver o utente salva o idx do servico            
+                if current_profissional.utente == utente:
+                    list_positions.insert_last(idx)
+            # para cada idx
+            it = list_positions.iterator()
+            while it.hax_next():
+                current_idx = it.next()
+                # remove o servico do idx (idx dos servicos do utente)
+                self.servicos.get(service_category).remove(current_idx)
+
+
+
+
+
+
     # ----------------------------------------------------------------------
     # def registrar_profissional(self, category, name):
     #     if category == "Medicina":
@@ -432,16 +576,43 @@ class Controller:
 
 
     def comp_strings(self, a, b):
-        return not(any([a[i] > b[i] for i in range(min(len(a),len(b)))]))
+        for i in range(len(a)):
+            if i >= len(b):
+                return False
+            elif a[i] < b[i]:
+                return True
+            elif a[i] > b[i]:
+                return False
+        return True
+
+    # def quicksort(self, l, left, right, comp):
+    #     i = left
+    #     j = right
+    #     pivot = l[int((i+j)/2)]
+    #     while i <= j:
+    #         while comp(l[i], pivot):
+    #             i += 1
+    #         while comp(pivot, l[j]):
+    #             j -= 1
+    #         if i <= j:
+    #             tmp = l[j]
+    #             l[j] = l[i]
+    #             l[i] = tmp
+    #             i += 1
+    #             j -= 1
+    #     if left < j:
+    #         self.quicksort(l, left, j, comp)
+    #     if i < right:
+    #         self.quicksort(l, i, right, comp)
 
     def quicksort(self, l, left, right, comp):
         i = left
         j = right
         pivot = l[int((i+j)/2)]
         while i <= j:
-            while comp(l[i], pivot):
+            while comp(l[i], pivot) and i<len(l):
                 i += 1
-            while comp(pivot, l[j]):
+            while comp(pivot, l[j]) and j>-1:
                 j -= 1
             if i <= j:
                 tmp = l[j]
@@ -453,5 +624,3 @@ class Controller:
             self.quicksort(l, left, j, comp)
         if i < right:
             self.quicksort(l, i, right, comp)
-
-    
