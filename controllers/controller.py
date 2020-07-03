@@ -114,26 +114,25 @@ class Controller:
                 return True
         return False
 
-    def has_valid_sequence(self, utente, service):
-        if self.utente_universe.get(utente).last_service == "Consulta":
-            return True
-        elif self.utente_universe.get(utente).last_service == "PequenaCirurgia":
-            if service == "Consulta":
-                return True            
-        elif self.utente_universe.get(utente).last_service == "Enfermagem":
-            if service != "PequenaCirurgia":
-                return True  
-        elif self.utente_universe.get(utente).last_service == None:
-            if service != "PequenaCirurgia":
-                return True
-        return False
-            
-    # def has_valid_sequence_list(self, list, utente):
-    #     last_service = self.utente_universe.get(utente).last_service
-    #     it = list.iterator()
-    #     while it.has_next():
-    #         current_item = it.next()
-    #         if last_service
+    def has_valid_sequence(self, service_list):
+        last_consulta = False
+        last_pequena_cirurgia = False        
+        it = service_list.iterator()
+        while it.has_next():
+            current_service = it.next()            
+            if current_service.name == "Consulta":
+                last_consulta = True
+            if current_service.name == "PequenaCirurgia" and last_consulta == False:
+                return False
+            if current_service.name == "PequenaCirurgia":
+                last_pequena_cirurgia = True
+                last_consulta = False
+            if last_pequena_cirurgia == True and current_service.name == "Consulta":
+                last_pequena_cirurgia = False
+        if last_pequena_cirurgia == True:
+            return False
+        return True
+
                 
     def has_service_utente(self, utente):
         list_keys = self.utente_universe.get(utente).servicos.keys()
@@ -411,14 +410,79 @@ class Controller:
         service.profissionais.get(category).insert_last(profissional)
 
 
-    def marcar_cuidados_utente(self, service, new_service, utente, profissional, category):        
-        # Marca service com o utente
-        self.utente_universe.get(utente).servicos.get(service).insert_last(new_service)
-        self.utente_universe.get(utente).last_service = service
-        # Marca o service com o profissional
-        self.categories.get(category).get(profissional).servicos.get(service).insert(utente, new_service)
-        # Marcaro service na lista de services
-        self.servicos.get(service).insert_last(new_service)
+    # def marcar_cuidados_utente(self, service, new_service, utente, profissional, category):        
+    #     # Marca service com o utente
+    #     self.utente_universe.get(utente).servicos.get(service).insert_last(new_service)
+    #     self.utente_universe.get(utente).last_service = service
+    #     # Marca o service com o profissional
+    #     self.categories.get(category).get(profissional).servicos.get(service).insert(utente, new_service)
+    #     # Marcaro service na lista de services
+    #     self.servicos.get(service).insert_last(new_service)
+
+    def marcar_cuidados_utente(self, list_service, utente):            
+        it = list_service.iterator()
+        while it.has_next():            
+            current_service = it.next()
+            # variables needed = serviuce_name, service, utente, profissional, category
+            # service = current_service
+            # utente = OK
+            # service_name:
+            service_name = current_service.name
+            # profissional e category
+            list_profissionais_medicina = None
+            list_profissionais_enfermagem = None
+            list_profissionais_auxiliar = None
+            if service_name == "Consulta":
+                list_profissionais_medicina = current_service.profissionais.get("Medicina")
+            elif service_name == "PequenaCirurgia":
+                list_profissionais_medicina = current_service.profissionais.get("Medicina")
+                list_profissionais_enfermagem = current_service.profissionais.get("Enfermagem")
+                list_profissionais_auxiliar = current_service.profissionais.get("Auxiliar")
+            elif service_name == "Enfermagem":
+                list_profissionais_enfermagem = current_service.profissionais.get("Enfermagem")
+                list_profissionais_auxiliar = current_service.profissionais.get("Auxiliar")
+
+            # Marcar service com o utente
+            self.utente_universe.get(utente).servicos.get(service_name).insert_last(current_service)
+            # Marcar service na lista de servicos
+            self.servicos.get(service_name).insert_last(current_service)
+            # Marcar o service com os profissionais
+            # Medicina
+            if list_profissionais_medicina is not None:
+                it_p = list_profissionais_medicina.iterator()
+                while it_p.has_next():
+                    current_profissional = it_p.next()
+                    #existe key com nome do utente?
+                    if not(self.categories.get("Medicina").get(current_profissional).servicos.get(service_name).has_key(utente)):
+                        self.categories.get("Medicina").get(current_profissional).servicos.get(service_name).insert(utente, SinglyLinkedList())
+                    # marca em cada profissional de medicina                                          
+                    self.categories.get("Medicina").get(current_profissional).servicos.get(service_name).get(utente).insert_last(current_service)
+                    # # marca em cada profissional de medicina
+                    # self.categories.get("Medicina").get(current_profissional).servicos.get(service_name).insert(utente, current_service)
+            # Enfermagem
+            if list_profissionais_enfermagem is not None:
+                it_p = list_profissionais_enfermagem.iterator()
+                while it_p.has_next():
+                    current_profissional = it_p.next()
+                    #existe key com nome do utente?
+                    if not(self.categories.get("Enfermagem").get(current_profissional).servicos.get(service_name).has_key(utente)):
+                        self.categories.get("Enfermagem").get(current_profissional).servicos.get(service_name).insert(utente, SinglyLinkedList())
+                    # marca em cada profissional de Enfermagem                                          
+                    self.categories.get("Enfermagem").get(current_profissional).servicos.get(service_name).get(utente).insert_last(current_service)
+                    # # marca em cada profissional de enfermagem
+                    # self.categories.get("Enfermagem").get(current_profissional).servicos.get(service_name).insert(utente, current_service)
+            # Auxiliar
+            if list_profissionais_auxiliar is not None:
+                it_p = list_profissionais_auxiliar.iterator()
+                while it_p.has_next():
+                    current_profissional = it_p.next()
+                    #existe key com nome do utente?
+                    if not(self.categories.get("Auxiliar").get(current_profissional).servicos.get(service_name).has_key(utente)):
+                        self.categories.get("Auxiliar").get(current_profissional).servicos.get(service_name).insert(utente, SinglyLinkedList())
+                    # marca em cada profissional de Auxiliar                                          
+                    self.categories.get("Auxiliar").get(current_profissional).servicos.get(service_name).get(utente).insert_last(current_service)
+                    # # marca em cada profissional de auxiliar
+                    # self.categories.get("Auxiliar").get(current_profissional).servicos.get(service_name).insert(utente, current_service)
 
 
     def desmarcar_cuidado_utente(self, utente):

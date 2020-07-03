@@ -132,45 +132,50 @@ class CLI:
 
             # Marcar Cuidados a Utente
             elif commands[0] == "MC":
+                service_list = SinglyLinkedList()
                 name = commands[1]
                 if controller.has_utente(name):
-                    list_services = SinglyLinkedList()
+                    service = None
                     while True:
-                        service = input()
-                        if service == "":
+                        line = input()
+                        if line == "":
+                            if service is not None:
+                                service_list.insert_last(service)
                             break
-                        if controller.has_service(service):
-                            # Cria o servico
-                            new_service = controller.create_service(service, name)
-                            all_good = False
-                            #Preenche o servico
-                            while True:
-                                new_line = input()
-                                if new_line == "":
-                                    break
-                                categoria_profissinal = new_line.split(" ")
-                                categoria = categoria_profissinal[0]
-                                profissional = categoria_profissinal[1]
-                                if controller.has_category(categoria):
-                                    if controller.has_profissional_category(profissional, categoria):
-                                        if controller.service_has_category(service, categoria):
-                                            controller.fill_service(new_service, profissional, categoria)
-                                            all_good = True
-                                        else:
-                                            print("Categoria inválida.")                                            
+                        commands = line.split(" ")
+                        
+                        
+                        if len(commands) == 1:
+                            service_name = commands[0]
+                            if service is not None:
+                                service_list.insert_last(service)
+                                service = None
+                            if controller.has_service(service_name):
+                                service = controller.create_service(service_name, name)
+                            else:
+                                print("Serviço Inexistente.")
+                        else:                            
+                            if service == None:
+                                print("Serviço Inexistente.")
+                                break
+                            categoria = commands[0]
+                            profissional = commands[1]
+                            if controller.has_category(categoria):
+                                if controller.has_profissional_category(profissional, categoria):
+                                    if controller.service_has_category(service_name, categoria):
+                                        controller.fill_service(service, profissional, categoria)
                                     else:
-                                        print("Profissinal de saude inexistente.")                                        
+                                        print("Categoria inválida.")
                                 else:
-                                    print("Categoria inexistente.")                                    
-                            # Se tudo der certo
-                            # Marca o servico ao utente e ao profissional
-                            if all_good:
-                                list_services.insert_last(new_service)
-                                # controller.marcar_cuidados_utente(service, new_service, name, profissional, categoria)
-                                # print("Cuidados marcados com sucesso.")
-                        else:
-                            print("Serviço Inexistente.")
-                            break
+                                    print("Profissinal de saude inexistente.")
+                            else:
+                                print("Categoria inexistente.")
+
+                    if controller.has_valid_sequence(service_list):
+                        controller.marcar_cuidados_utente(service_list, name)
+                        print("Cuidados marcados com sucesso.")
+                    else:
+                        print("Sequencia inválida.")
                 else:
                     print("Utente Inexistente.")
 
