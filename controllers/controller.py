@@ -551,7 +551,7 @@ class Controller:
                 current_service = it.next()
                 idx += 1
                 # se o servico tiver o utente salva o idx do servico            
-                if current_profissional.utente == utente:
+                if current_service.utente == utente:
                     list_positions.insert_last(idx)
             # para cada idx
             it = list_positions.iterator()
