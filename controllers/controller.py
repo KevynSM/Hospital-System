@@ -161,6 +161,29 @@ class Controller:
                 return True
         return False
 
+    def has_service_profissional(self, name, category):
+        if category == "Medicina":
+            if self.categories.get("Medicina").get(name).servicos.get("Consulta").size() > 0:
+                return True
+            if self.categories.get("Medicina").get(name).servicos.get("PequenaCirurgia").size() > 0:
+                return True
+        elif category == "Enfermagem":
+            if self.categories.get("Medicina").get(name).servicos.get("PequenaCirurgia").size() > 0:
+                return True
+            if self.categories.get("Medicina").get(name).servicos.get("Enfermagem").size() > 0:
+                return True
+        elif category == "Auxiliar":
+            if self.categories.get("Medicina").get(name).servicos.get("PequenaCirurgia").size() > 0:
+                return True
+            if self.categories.get("Medicina").get(name).servicos.get("Enfermagem").size() > 0:
+                return True
+        return False
+
+
+    def are_there_service(self, service):
+        if self.servicos.get(service).size() > 0:
+            return True
+        return False
 
 
 #------------------------------------ do something ----------------------------------
@@ -745,6 +768,139 @@ class Controller:
                     #list_family.insert_last(f"Idoso {idosos_array[j]}")
 
         return list_family
+
+
+    def listar_marcados_profissional(self, name, category):
+        list_final = SinglyLinkedList()
+        list_consulta = SinglyLinkedList()
+        list_pequenacirurgia = SinglyLinkedList()
+        list_enfermagem = SinglyLinkedList()
+        if category == "Medicina":
+            list_consulta = self.categories.get(category).get(name).servicos.get("Consulta").keys()
+            list_pequenacirurgia = self.categories.get(category).get(name).servicos.get("PequenaCirurgia").keys()
+        elif category == "Enfermagem":
+            list_pequenacirurgia = self.categories.get(category).get(name).servicos.get("PequenaCirurgia").keys()
+            list_enfermagem = self.categories.get(category).get(name).servicos.get("Enfermagem").keys()
+        elif category == "Auxiliar":
+            list_pequenacirurgia = self.categories.get(category).get(name).servicos.get("PequenaCirurgia").keys()
+            list_enfermagem = self.categories.get(category).get(name).servicos.get("Enfermagem").keys()
+        
+        list_consulta_size = list_consulta.size()
+        consulta_array = (list_consulta_size * ctypes.py_object)() # Array of pointers
+        
+        list_pequenacirurgia_size = list_pequenacirurgia.size()
+        pequenacirurgia_array = (list_pequenacirurgia_size * ctypes.py_object)() # Array of pointers
+        
+        list_enfermagem_size = list_enfermagem.size()
+        enfermagem_array = (list_enfermagem_size * ctypes.py_object)() # Array of pointers
+
+        if len(consulta_array) > 0:
+            idx = -1
+            it = list_consulta.iterator()
+            while it.has_next():
+                current_item = it.next()
+                idx += 1
+                consulta_array[idx] = current_item
+            self.quicksort(consulta_array, 0, idx, self.comp_strings)
+            
+            for i in range(len(consulta_array)):
+                multiplicador = self.categories.get(category).get(name).servicos.get("Consulta").get(consulta_array[i]).size()
+                for j in range(multiplicador):
+                    list_final.insert_last(f"Consulta {consulta_array[i]}")
+
+        if len(pequenacirurgia_array) > 0:
+            idx = -1
+            it = list_pequenacirurgia.iterator()
+            while it.has_next():
+                current_item = it.next()
+                idx += 1
+                pequenacirurgia_array[idx] = current_item
+            self.quicksort(pequenacirurgia_array, 0, idx, self.comp_strings)
+
+            for i in range(len(pequenacirurgia_array)):
+                multiplicador = self.categories.get(category).get(name).servicos.get("PequenaCirurgia").get(pequenacirurgia_array[i]).size() 
+                for j in range(multiplicador):
+                    list_final.insert_last(f"PequenaCirurgia {pequenacirurgia_array[j]}")
+
+        if len(enfermagem_array) > 0:
+            idx = -1
+            it = list_enfermagem.iterator()
+            while it.has_next():
+                current_item = it.next()
+                idx += 1
+                enfermagem_array[idx] = current_item
+            self.quicksort(enfermagem_array, 0 , idx, self.comp_strings)
+
+            for i in range(len(enfermagem_array)):
+                multiplicador = self.categories.get(category).get(name).servicos.get("Enfermagem").get(enfermagem_array[i]).size() 
+                for j in range(multiplicador):
+                    list_final.insert_last(f"Enfermagem {enfermagem_array[i]}")
+
+        return list_final
+
+        
+    def listar_marcados_service(self, service):
+        list_final = SinglyLinkedList()
+        
+        categories = SinglyLinkedList()
+        if service == "Consulta":
+            categories.insert_last("Medicina")
+        elif service == "PequenaCirurgia":
+            categories.insert_last("Medicina")
+            categories.insert_last("Enfermagem")
+            categories.insert_last("Auxiliar")
+        elif service == "Enfermagem":
+            categories.insert_last("Enfermagem")
+            categories.insert_last("Auxiliar")
+
+        # ["Medicina"] or ["Medicina", "Enfermagem", "Auxiliar"] or ["Enfermagem", "Auxiliar"] 
+        it = categories.iterator()
+        while it.has_next():
+            current_category = it.next()
+
+            list_profissionais = self.categories.get(current_category).keys()
+            list_profissionais_size = list_profissionais.size()
+            profissionais_array = (list_profissionais_size * ctypes.py_object)() # Array of pointers
+
+            if len(profissionais_array) > 0:
+                idx = -1
+                it_p = list_profissionais.iterator()
+                while it_p.has_next():
+                    current_profissional = it_p.next()
+                    idx += 1
+                    profissionais_array[idx] = current_profissional
+                self.quicksort(profissionais_array, 0 , idx, self.comp_strings)
+
+                for j in range(len(profissionais_array)):
+                    #if self.categories.get(current_category).get(profissionais_array[j]).servicos.get(service).size() > 0:
+                    list_utentes = self.categories.get(current_category).get(profissionais_array[j]).servicos.get(service).keys()
+                    list_utentes_size = list_utentes.size()
+                    utentes_array = (list_utentes_size * ctypes.py_object)() # Array of pointers
+
+                    if len(utentes_array) > 0:
+                        idx = -1
+                        it_u = list_utentes.iterator()
+                        while it_u.has_next():
+                            current_utente = it_u.next()
+                            idx += 1
+                            utentes_array[idx] = current_utente
+                        self.quicksort(utentes_array, 0, idx, self.comp_strings)
+                        for i in range(len(utentes_array)):
+                            list_final.insert_last(f"{current_category} {profissionais_array[j]} {utentes_array[i]}")
+
+        return list_final
+
+        
+
+
+            
+
+            
+
+
+
+
+
 
 
 # -----------------------------------quicksort ---------------------------    

@@ -217,7 +217,7 @@ class CLI:
                         it = list_services.iterator()
                         while it.has_next():
                             current_item = it.next()
-                            print(f"{current_item}")
+                            print(f"{current_item}.")
                     else:
                         print("Família sem cuidados de saúde marcados.")
                 else:
@@ -227,12 +227,33 @@ class CLI:
             elif commands[0] == "LSP":
                 category = commands[1]
                 name = commands[2]
-                pass
+                if controller.has_profissional_category(name, category):
+                    if controller.has_service_profissional(name, category):
+                        list_services = controller.listar_marcados_profissional(name, category)
+                        it = list_services.iterator()
+                        while it.has_next():
+                            current_item = it.next()
+                            print(f"{current_item}.")
+                    else:
+                        print("Profissional de saúde sem marcações.")
+                else:
+                    print("Profissional de saúde inexistente.")
+                
 
             # Listar Marcacoes por tipo de Servico
             elif commands[0] == "LMS":
                 service = commands[1]
-                pass
+                if controller.has_service(service):
+                    if controller.are_there_service(service):
+                        list_service = controller.listar_marcados_service(service)
+                        it = list_service.iterator()
+                        while it.has_next():
+                            current_item = it.next()
+                            print(f"{current_item}.")
+                    else:
+                        print("Serviço sem marcações.")
+                else:
+                    print("Serviço inexistente.")
 
                         
             else:
