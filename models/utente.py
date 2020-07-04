@@ -7,8 +7,6 @@ class Utente:
         self.faixa_etaria = faixa_etaria
         self.familia_associada = None
 
-        self.last_service = None
-
         self.servicos = HashTable()
         self.servicos.insert("Consulta",SinglyLinkedList())
         self.servicos.insert("PequenaCirurgia",SinglyLinkedList())

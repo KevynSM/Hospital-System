@@ -179,50 +179,7 @@ class CLI:
                 else:
                     print("Utente Inexistente.")
 
-            # # Marcar Cuidados a Utente
-            # elif commands[0] == "MC":
-            #     name = commands[1]
-            #     if controller.has_utente(name):
-            #         while True:
-            #             service = input()
-            #             if service == "":
-            #                 break
-            #             if controller.has_service(service):
-            #                 # Cria o servico
-            #                 new_service = controller.create_service(service, name)
-            #                 all_good = False
-            #                 #Preenche o servico
-            #                 while True:
-            #                     new_line = input()
-            #                     if new_line == "":
-            #                         break
-            #                     categoria_profissinal = new_line.split(" ")
-            #                     categoria = categoria_profissinal[0]
-            #                     profissional = categoria_profissinal[1]
-            #                     if controller.has_category(categoria):
-            #                         if controller.has_profissional_category(profissional, categoria):
-            #                             if controller.service_has_category(service, categoria):
-            #                                 if controller.has_valid_sequence(name, service):
-            #                                     controller.fill_service(new_service, profissional, categoria)
-            #                                     all_good = True
-            #                                 else:
-            #                                     print("Sequencia inválida.")                                                
-            #                             else:
-            #                                 print("Categoria inválida.")                                            
-            #                         else:
-            #                             print("Profissinal de saude inexistente.")                                        
-            #                     else:
-            #                         print("Categoria inexistente.")                                    
-            #                 # Se tudo der certo
-            #                 # Marca o servico ao utente e ao profissional
-            #                 if all_good:
-            #                     controller.marcar_cuidados_utente(service, new_service, name, profissional, categoria)
-            #                     print("Cuidados marcados com sucesso.")
-            #             else:
-            #                 print("Serviço Inexistente.")
-            #                 break
-            #     else:
-            #         print("Utente Inexistente.")
+            
 
             # Cancelar Cuidados Marcados a Utente
             elif commands[0] == "CC":
@@ -239,7 +196,17 @@ class CLI:
             # Listar Cuidados Marcados a Utente
             elif commands[0] == "LCU":
                 name = commands[1]
-                pass
+                if controller.has_utente(name):
+                    if controller.has_service_utente(name):
+                        list_services = controller.listar_cuidados_utente(name)
+                        it = list_services.iterator()
+                        while it.has_next():
+                            current_item = it.next()
+                            print(f"{current_item}.")
+                    else:
+                        print("Utente sem cuidados de saúde marcados.")
+                else:
+                    print("Utente inexistente.")
 
             # Listar Cuidados Marcados a Familia
             elif commands[0] == "LCF":
@@ -257,15 +224,6 @@ class CLI:
                 service = commands[1]
                 pass
 
-            # Gravar
-            elif commands[0] == "G":
-                file = commands[1]
-                pass
-
-            # Ler
-            elif commands[0] == "L":
-                file = commands[1]
-                pass
-            
+                        
             else:
                 print("Instrução inválida.")

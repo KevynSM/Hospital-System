@@ -33,7 +33,11 @@ class Controller:
         self.servicos.insert("PequenaCirurgia",SinglyLinkedList())
         self.servicos.insert("Enfermagem",SinglyLinkedList())
 
-    
+        self.servicos_list_ordered = SinglyLinkedList()
+        self.servicos_list_ordered.insert_last("Consulta")
+        self.servicos_list_ordered.insert_last("PequenaCirurgia")
+        self.servicos_list_ordered.insert_last("Enfermagem")
+
 #-------------------------------- Booleans --------------------------------------------
     def has_utente(self, name):
         if self.utente_universe.has_key(name):
@@ -410,15 +414,6 @@ class Controller:
         service.profissionais.get(category).insert_last(profissional)
 
 
-    # def marcar_cuidados_utente(self, service, new_service, utente, profissional, category):        
-    #     # Marca service com o utente
-    #     self.utente_universe.get(utente).servicos.get(service).insert_last(new_service)
-    #     self.utente_universe.get(utente).last_service = service
-    #     # Marca o service com o profissional
-    #     self.categories.get(category).get(profissional).servicos.get(service).insert(utente, new_service)
-    #     # Marcaro service na lista de services
-    #     self.servicos.get(service).insert_last(new_service)
-
     def marcar_cuidados_utente(self, list_service, utente):            
         it = list_service.iterator()
         while it.has_next():            
@@ -559,6 +554,82 @@ class Controller:
                 current_idx = it.next()
                 # remove o servico do idx (idx dos servicos do utente)
                 self.servicos.get(service_category).remove(current_idx)
+
+
+
+    def listar_cuidados_utente(self, utente):
+        list_cuidados_final = SinglyLinkedList()
+        #
+        list_services_category = self.servicos_list_ordered
+        # ["Consulta", "PequenaCirurgia", "Enfermagem"]
+        it = list_services_category.iterator()
+        while it.has_next():
+            service_category = it.next()
+            # lista com os servicoes de uma categoria de servicos
+            list_services = self.utente_universe.get(utente).servicos.get(service_category)
+
+            
+
+            # por cada servico dentro de uma categoria de servico
+            it_s = list_services.iterator()
+            while it_s.has_next():
+                list_profissionais_medicina = None
+                list_profissionais_enfermagem = None
+                list_profissionais_auxiliar = None
+
+
+                current_service = it_s.next()
+                if current_service.name == "Consulta":
+                    list_profissionais_medicina = current_service.profissionais.get("Medicina")
+                elif current_service.name == "PequenaCirurgia":
+                    list_profissionais_medicina = current_service.profissionais.get("Medicina")
+                    list_profissionais_enfermagem = current_service.profissionais.get("Enfermagem")
+                    list_profissionais_auxiliar = current_service.profissionais.get("Auxiliar")
+                elif current_service.name == "Enfermagem":
+                    list_profissionais_enfermagem = current_service.profissionais.get("Enfermagem")
+                    list_profissionais_auxiliar = current_service.profissionais.get("Auxiliar")
+
+                if list_profissionais_medicina is not None and list_profissionais_medicina.size() > 0:
+                    list_profissionais_medicina_size = list_profissionais_medicina.size()
+                    medicina_array = (list_profissionais_medicina_size * ctypes.py_object)() # Array of pointers
+                    idx = -1
+                    it_p = list_profissionais_medicina.iterator()
+                    while it_p.has_next():
+                        current_item = it_p.next()
+                        idx += 1
+                        medicina_array[idx] = current_item
+                    self.quicksort(medicina_array, 0, idx, self.comp_strings)
+                    for i in range(list_profissionais_medicina_size):
+                        list_cuidados_final.insert_last(f"{service_category} Medicina {medicina_array[i]}")
+
+                if list_profissionais_enfermagem is not None and list_profissionais_enfermagem.size() > 0:
+                    list_profissionais_enfermagem_size = list_profissionais_enfermagem.size()
+                    enfermagem_array = (list_profissionais_enfermagem_size * ctypes.py_object)() # Array of pointers
+                    idx = -1
+                    it_p = list_profissionais_enfermagem.iterator()
+                    while it_p.has_next():
+                        current_item = it_p.next()
+                        idx += 1
+                        enfermagem_array[idx] = current_item
+                    self.quicksort(enfermagem_array, 0, idx, self.comp_strings)
+                    for i in range(list_profissionais_enfermagem_size):
+                        list_cuidados_final.insert_last(f"{service_category} Enfermagem {enfermagem_array[i]}")
+
+                if list_profissionais_auxiliar is not None and list_profissionais_auxiliar.size() > 0:
+                    list_profissionais_auxiliar_size = list_profissionais_auxiliar.size()
+                    auxiliar_array = (list_profissionais_auxiliar_size * ctypes.py_object)() # Array of pointers
+                    idx = -1
+                    it_p = list_profissionais_auxiliar.iterator()
+                    while it_p.has_next():
+                        current_item = it_p.next()
+                        idx += 1
+                        auxiliar_array[idx] = current_item
+                    self.quicksort(auxiliar_array, 0, idx, self.comp_strings)
+                    for i in range(list_profissionais_auxiliar_size):
+                        list_cuidados_final.insert_last(f"{service_category} Auxiliar {auxiliar_array[i]}")
+
+        return list_cuidados_final
+
 
 # -----------------------------------quicksort ---------------------------    
 
