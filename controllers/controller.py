@@ -148,7 +148,18 @@ class Controller:
         return False
                 
 
-
+    def has_service_family(self, family_name):
+        list_utentes = self.family_universe.get(family_name).utentes_associados
+        it = list_utentes.iterator()
+        while it.has_next():
+            current_item = it.next()
+            if self.utente_universe.get(current_item).servicos.get("Consulta").size() > 0:
+                return True
+            if self.utente_universe.get(current_item).servicos.get("PequenaCirurgia").size() > 0:
+                return True
+            if self.utente_universe.get(current_item).servicos.get("Enfermagem").size() > 0:
+                return True
+        return False
 
 
 
@@ -238,29 +249,32 @@ class Controller:
         idosos_array = (list_idosos_size * ctypes.py_object)() # Array of pointers
         # Passing the lists to an Array and ordering
         # jovens
-        idx = -1
-        it = list_jovens.iterator()
-        while it.has_next():
-            current_item = it.next()
-            idx += 1
-            jovens_array[idx] = current_item
-        self.quicksort(jovens_array, 0, idx, self.comp_strings)
+        if len(jovens_array) > 0:
+            idx = -1
+            it = list_jovens.iterator()
+            while it.has_next():
+                current_item = it.next()
+                idx += 1
+                jovens_array[idx] = current_item
+            self.quicksort(jovens_array, 0, idx, self.comp_strings)
         # Adultos
-        idx = -1
-        it = list_adultos.iterator()
-        while it.has_next():
-            current_item = it.next()
-            idx += 1
-            adultos_array[idx] = current_item
-        self.quicksort(adultos_array, 0, idx, self.comp_strings)
+        if len(adultos_array) > 0:
+            idx = -1
+            it = list_adultos.iterator()
+            while it.has_next():
+                current_item = it.next()
+                idx += 1
+                adultos_array[idx] = current_item
+            self.quicksort(adultos_array, 0, idx, self.comp_strings)
         # Idosos
-        idx = -1
-        it = list_idosos.iterator()
-        while it.has_next():
-            current_item = it.next()
-            idx += 1
-            idosos_array[idx] = current_item
-        self.quicksort(idosos_array, 0, idx, self.comp_strings)
+        if len(idosos_array) > 0:
+            idx = -1
+            it = list_idosos.iterator()
+            while it.has_next():
+                current_item = it.next()
+                idx += 1
+                idosos_array[idx] = current_item
+            self.quicksort(idosos_array, 0, idx, self.comp_strings)
         # Create an ordered array of familis names
         # Exacly how it is in the function listar_familias()
         list_families = self.family_universe.keys()
@@ -268,46 +282,52 @@ class Controller:
         families_array = (list_families_size * ctypes.py_object)() # Array of pointers
         idx = -1
         # Passing the families from the linkedlist to an Array
-        it = list_families.iterator()
-        while it.has_next():
-            current_item = it.next()
-            idx += 1
-            families_array[idx] = current_item
-        # Ordering the array with families
-        self.quicksort(families_array, 0, idx, self.comp_strings)
+        if len(families_array) > 0:
+            it = list_families.iterator()
+            while it.has_next():
+                current_item = it.next()
+                idx += 1
+                families_array[idx] = current_item
+            # Ordering the array with families
+            self.quicksort(families_array, 0, idx, self.comp_strings)
 
         # Print the Jovem-Adulto-Idoso order for each Family
-        for i in range(list_families_size):
-            for j in range(list_jovens_size):
-                if families_array[i] == self.utente_universe.get(jovens_array[j]).familia_associada:
-                    # print(f"{families_array[i]} Jovem {jovens_array[j]}")
-                    list_utentes.insert_last(f"{families_array[i]} Jovem {jovens_array[j]}")
-            
-            for j in range(list_adultos_size):
-                if families_array[i] == self.utente_universe.get(adultos_array[j]).familia_associada:
-                    # print(f"{families_array[i]} Adulto {adultos_array[j]}")
-                    list_utentes.insert_last(f"{families_array[i]} Adulto {adultos_array[j]}")
+        if len(families_array) > 0: 
+            for i in range(list_families_size):
+                if len(jovens_array) > 0:
+                    for j in range(list_jovens_size):
+                        if families_array[i] == self.utente_universe.get(jovens_array[j]).familia_associada:
+                            # print(f"{families_array[i]} Jovem {jovens_array[j]}")
+                            list_utentes.insert_last(f"{families_array[i]} Jovem {jovens_array[j]}")
+                
+                if len(adultos_array) > 0:
+                    for j in range(list_adultos_size):
+                        if families_array[i] == self.utente_universe.get(adultos_array[j]).familia_associada:
+                            # print(f"{families_array[i]} Adulto {adultos_array[j]}")
+                            list_utentes.insert_last(f"{families_array[i]} Adulto {adultos_array[j]}")
 
-            for j in range(list_idosos_size):
-                if families_array[i] == self.utente_universe.get(idosos_array[j]).familia_associada:
-                    # print(f"{families_array[i]} Idoso {idosos_array[j]}")
-                    list_utentes.insert_last(f"{families_array[i]} Idoso {idosos_array[j]}")
+                if len(idosos_array) > 0:
+                    for j in range(list_idosos_size):
+                        if families_array[i] == self.utente_universe.get(idosos_array[j]).familia_associada:
+                            # print(f"{families_array[i]} Idoso {idosos_array[j]}")
+                            list_utentes.insert_last(f"{families_array[i]} Idoso {idosos_array[j]}")
 
         # Print the utenes witchout families associated
-        for i in range(list_jovens_size):
-            if self.utente_universe.get(jovens_array[i]).familia_associada == None:
-                # print(f"Jovem {jovens_array[i]}")
-                list_utentes.insert_last(f"Jovem {jovens_array[i]}")
-        
-        for i in range(list_adultos_size):
-            if self.utente_universe.get(adultos_array[i]).familia_associada == None:
-                # print(f"Adulto {adultos_array[i]}")
-                list_utentes.insert_last(f"Adulto {adultos_array[i]}")
-
-        for i in range(list_idosos_size):
-            if self.utente_universe.get(idosos_array[i]).familia_associada == None:
-                # print(f"Idoso {idosos_array[i]}")
-                list_utentes.insert_last(f"Idoso {idosos_array[i]}")
+        if len(jovens_array) > 0:
+            for i in range(list_jovens_size):
+                if self.utente_universe.get(jovens_array[i]).familia_associada == None:
+                    # print(f"Jovem {jovens_array[i]}")
+                    list_utentes.insert_last(f"Jovem {jovens_array[i]}")
+        if len(adultos_array) > 0:   
+            for i in range(list_adultos_size):
+                if self.utente_universe.get(adultos_array[i]).familia_associada == None:
+                    # print(f"Adulto {adultos_array[i]}")
+                    list_utentes.insert_last(f"Adulto {adultos_array[i]}")
+        if len(idosos_array) > 0:
+            for i in range(list_idosos_size):
+                if self.utente_universe.get(idosos_array[i]).familia_associada == None:
+                    # print(f"Idoso {idosos_array[i]}")
+                    list_utentes.insert_last(f"Idoso {idosos_array[i]}")
         return list_utentes
 
     
@@ -363,44 +383,48 @@ class Controller:
         idosos_array = (list_idosos_size * ctypes.py_object)() # Array of pointers
         # Passing the lists to an Array and ordering
         # jovens
-        idx = -1
-        it = list_jovens.iterator()
-        while it.has_next():
-            current_item = it.next()
-            idx += 1
-            jovens_array[idx] = current_item
-        self.quicksort(jovens_array, 0, idx, self.comp_strings)
+        if len(jovens_array) > 0:
+            idx = -1
+            it = list_jovens.iterator()
+            while it.has_next():
+                current_item = it.next()
+                idx += 1
+                jovens_array[idx] = current_item
+            self.quicksort(jovens_array, 0, idx, self.comp_strings)
         # Adultos
-        idx = -1
-        it = list_adultos.iterator()
-        while it.has_next():
-            current_item = it.next()
-            idx += 1
-            adultos_array[idx] = current_item
-        self.quicksort(adultos_array, 0, idx, self.comp_strings)
+        if len(adultos_array) > 0:
+            idx = -1
+            it = list_adultos.iterator()
+            while it.has_next():
+                current_item = it.next()
+                idx += 1
+                adultos_array[idx] = current_item
+            self.quicksort(adultos_array, 0, idx, self.comp_strings)
         # Idosos
-        idx = -1
-        it = list_idosos.iterator()
-        while it.has_next():
-            current_item = it.next()
-            idx += 1
-            idosos_array[idx] = current_item
-        self.quicksort(idosos_array, 0, idx, self.comp_strings)
+        if len(idosos_array) > 0:
+            idx = -1
+            it = list_idosos.iterator()
+            while it.has_next():
+                current_item = it.next()
+                idx += 1
+                idosos_array[idx] = current_item
+            self.quicksort(idosos_array, 0, idx, self.comp_strings)
         # Print the Jovem-Adulto-Idoso order for the Family
-        for j in range(list_jovens_size):
-            if family_name == self.utente_universe.get(jovens_array[j]).familia_associada:
-                # print(f"Jovem {jovens_array[j]}")
-                list_family.insert_last(f"Jovem {jovens_array[j]}")
-            
-        for j in range(list_adultos_size):
-            if family_name == self.utente_universe.get(adultos_array[j]).familia_associada:
-                # print(f"Adulto {adultos_array[j]}")
-                list_family.insert_last(f"Adulto {adultos_array[j]}")
-
-        for j in range(list_idosos_size):
-            if family_name == self.utente_universe.get(idosos_array[j]).familia_associada:
-                #print(f"Idoso {idosos_array[j]}")
-                list_family.insert_last(f"Idoso {idosos_array[j]}")
+        if len(jovens_array) > 0:
+            for j in range(list_jovens_size):
+                if family_name == self.utente_universe.get(jovens_array[j]).familia_associada:
+                    # print(f"Jovem {jovens_array[j]}")
+                    list_family.insert_last(f"Jovem {jovens_array[j]}")
+        if len(adultos_array) > 0:      
+            for j in range(list_adultos_size):
+                if family_name == self.utente_universe.get(adultos_array[j]).familia_associada:
+                    # print(f"Adulto {adultos_array[j]}")
+                    list_family.insert_last(f"Adulto {adultos_array[j]}")
+        if len(idosos_array) > 0:
+            for j in range(list_idosos_size):
+                if family_name == self.utente_universe.get(idosos_array[j]).familia_associada:
+                    #print(f"Idoso {idosos_array[j]}")
+                    list_family.insert_last(f"Idoso {idosos_array[j]}")
 
         return list_family
 
@@ -629,6 +653,98 @@ class Controller:
                         list_cuidados_final.insert_last(f"{service_category} Auxiliar {auxiliar_array[i]}")
 
         return list_cuidados_final
+
+
+    def listar_cuidados_familia(self, family_name):
+        # lsit that will be returned
+        list_family = SinglyLinkedList()
+        list_itens = self.utente_universe.items()
+        # 3 list to separate the "faixas etarias"
+        list_jovens = SinglyLinkedList()
+        list_adultos = SinglyLinkedList()
+        list_idosos = SinglyLinkedList()
+        # filing the lists
+        it = list_itens.iterator()
+        while it.has_next():
+            current_item = it.next()
+            if current_item.get_value().faixa_etaria == "Jovem":
+                list_jovens.insert_last(current_item.get_value().name)
+            elif current_item.get_value().faixa_etaria == "Adulto":
+                list_adultos.insert_last(current_item.get_value().name)
+            elif current_item.get_value().faixa_etaria == "Idoso":
+                list_idosos.insert_last(current_item.get_value().name)
+        # Create an array for each "faixa etaria" list
+        list_jovens_size = list_jovens.size()
+        jovens_array = (list_jovens_size * ctypes.py_object)() # Array of pointers
+        list_adultos_size = list_adultos.size()
+        adultos_array = (list_adultos_size * ctypes.py_object)() # Array of pointers
+        list_idosos_size = list_idosos.size()
+        idosos_array = (list_idosos_size * ctypes.py_object)() # Array of pointers
+        # Passing the lists to an Array and ordering
+        # jovens
+        if len(jovens_array) > 0:
+            idx = -1
+            it = list_jovens.iterator()
+            while it.has_next():
+                current_item = it.next()
+                idx += 1
+                jovens_array[idx] = current_item
+            self.quicksort(jovens_array, 0, idx, self.comp_strings)
+        # Adultos
+        if len(adultos_array) > 0:
+            idx = -1
+            it = list_adultos.iterator()
+            while it.has_next():
+                current_item = it.next()
+                idx += 1
+                adultos_array[idx] = current_item
+            self.quicksort(adultos_array, 0, idx, self.comp_strings)
+        # Idosos
+        if len(idosos_array) > 0:
+            idx = -1
+            it = list_idosos.iterator()
+            while it.has_next():
+                current_item = it.next()
+                idx += 1
+                idosos_array[idx] = current_item
+            self.quicksort(idosos_array, 0, idx, self.comp_strings)
+        # Print the Jovem-Adulto-Idoso order for the Family
+        if len(jovens_array) > 0:
+            for j in range(list_jovens_size):
+                if family_name == self.utente_universe.get(jovens_array[j]).familia_associada:
+                    utente_name = jovens_array[j]
+                    list_service = self.listar_cuidados_utente(utente_name)
+                    it_s = list_service.iterator()
+                    while it_s.has_next():
+                        current_item = it_s.next()
+                        list_family.insert_last(f"{utente_name} {current_item}")
+                    # print(f"Jovem {jovens_array[j]}")
+                    #list_family.insert_last(f"Jovem {jovens_array[j]}")
+
+        if len(adultos_array) > 0:
+            for j in range(list_adultos_size):
+                if family_name == self.utente_universe.get(adultos_array[j]).familia_associada:
+                    utente_name = adultos_array[j]
+                    list_service = self.listar_cuidados_utente(utente_name)
+                    it_s = list_service.iterator()
+                    while it_s.has_next():
+                        current_item = it_s.next()
+                        list_family.insert_last(f"{utente_name} {current_item}")
+                    # print(f"Adulto {adultos_array[j]}")
+                    #list_family.insert_last(f"Adulto {adultos_array[j]}")
+        if len(idosos_array) > 0:
+            for j in range(list_idosos_size):
+                if family_name == self.utente_universe.get(idosos_array[j]).familia_associada:
+                    utente_name = idosos_array[j]
+                    list_service = self.listar_cuidados_utente(utente_name)
+                    it_s = list_service.iterator()
+                    while it_s.has_next():
+                        current_item = it_s.next()
+                        list_family.insert_last(f"{utente_name} {current_item}")
+                    #print(f"Idoso {idosos_array[j]}")
+                    #list_family.insert_last(f"Idoso {idosos_array[j]}")
+
+        return list_family
 
 
 # -----------------------------------quicksort ---------------------------    

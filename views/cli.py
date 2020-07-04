@@ -211,7 +211,17 @@ class CLI:
             # Listar Cuidados Marcados a Familia
             elif commands[0] == "LCF":
                 family_name = commands[1]
-                pass
+                if controller.has_that_family(family_name):
+                    if controller.has_service_family(family_name):
+                        list_services = controller.listar_cuidados_familia(family_name)
+                        it = list_services.iterator()
+                        while it.has_next():
+                            current_item = it.next()
+                            print(f"{current_item}")
+                    else:
+                        print("Família sem cuidados de saúde marcados.")
+                else:
+                    print("Família inexistete.")
 
             # Listar Servicos Marcados a Profissionais
             elif commands[0] == "LSP":
