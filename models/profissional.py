@@ -6,19 +6,7 @@ class Profissional:
         self.name = name
         self.category = category
         self.servicos = HashTable()
-
-        # if category == "Medicina":
-        #     self.servicos.insert("Consulta", SinglyLinkedList())
-        #     self.servicos.insert("PequenaCirurgia", SinglyLinkedList())
-        # elif category == "Enfermagem":
-        #     self.servicos.insert("PequenaCirurgia", SinglyLinkedList())
-        #     self.servicos.insert("Enfermagem", SinglyLinkedList())
-        # elif category == "Auxiliar":
-        #     self.servicos.insert("PequenaCirurgia", SinglyLinkedList())
-        #     self.servicos.insert("Enfermagem", SinglyLinkedList())
-
-            #syngle -> hashtable por nome do utente
-            
+             
         if category == "Medicina":
             self.servicos.insert("Consulta", HashTable())
             self.servicos.insert("PequenaCirurgia", HashTable())

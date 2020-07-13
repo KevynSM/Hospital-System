@@ -7,10 +7,7 @@ from models.servicos import Servico
 import ctypes
 
 class Controller:
-    def __init__(self):
-        # self.category_array = (3 * ctypes.py_object)() # Array of pointers        
-        # for i in range(3):
-        #     self.category_array[i] = HashTable()
+    def __init__(self):        
 
         self.categories = HashTable()
         self.categories.insert("Medicina", HashTable())
@@ -130,7 +127,7 @@ class Controller:
                 return False
             if current_service.name == "PequenaCirurgia":
                 last_pequena_cirurgia = True
-                last_consulta = False
+                #last_consulta = False
             if last_pequena_cirurgia == True and current_service.name == "Consulta":
                 last_pequena_cirurgia = False
         if last_pequena_cirurgia == True:
